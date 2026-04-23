@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+spacy
+spacy-entity-linker
+sentence-transformers
+torch
+pandas
+numpy
+scikit-learn
+scipy
+tqdm
+requests
+SPARQLWrapper
+pydantic
+flask-ngrok
+flask-cors
