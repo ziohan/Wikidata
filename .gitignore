@@ -1,42 +1,45 @@
-# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# Frontend files
+/frontend/node_modules
+/frontend/dist
+/frontend/.angular/cache
+/frontend/coverage
+/frontend/.sass-cache
+/frontend/tmp
+/frontend/out-tsc
 
-# Compiled output
-/dist
-/tmp
-/out-tsc
-/bazel-out
+# logs
+/frontend/npm-debug.log*
+/frontend/yarn-error.log*
 
-# Node
-/node_modules
-npm-debug.log
-yarn-error.log
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
 
-# IDEs and editors
+# virtual env
+venv/
+.env/
+.env.*
+
+# Database files
+/backend/data/wikidata.db
+
+# temporary files
+*.csv~
+*.tmp
+
+#IDE
 .idea/
-.project
-.classpath
-.c9/
-*.launch
-.settings/
 *.sublime-workspace
+*.sublime-project
 
-# Visual Studio Code
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-.history/*
-
-# Miscellaneous
-/.angular/cache
-.sass-cache/
-/connect.lock
-/coverage
-/libpeerconnection.log
-testem.log
-/typings
-
-# System files
+# OS Files
 .DS_Store
 Thumbs.db
+
+# MISC
+coverage/
+*.log
+*.lock
+
+KG_papers_tree_layout/*

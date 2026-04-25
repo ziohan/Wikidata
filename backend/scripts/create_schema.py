@@ -16,6 +16,26 @@ def create_schema():
     )
     """)
 
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS queries (
+        id TEXT PRIMARY KEY,
+        title TEXT,
+        hops INTEGER,
+        top_n INTEGER,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS query_results (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        query_id TEXT NOT NULL,
+        triple TEXT NOT NULL,
+        score REAL NOT NULL,
+
+        FOREIGN KEY(query_id) REFERENCES queries(id)
+    )
+    """)
     # Predicates - pids
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS predicates (
@@ -78,6 +98,11 @@ def create_schema():
     cursor.execute("""
     CREATE INDEX IF NOT EXISTS idx_cache_qid
     ON entity_cache(qid)
+    """)
+
+    cursor.execute("""
+    CREATE INDEX IF NOT EXISTS idx_query_results_query_id
+    ON query_results(query_id)
     """)
 
     conn.commit()

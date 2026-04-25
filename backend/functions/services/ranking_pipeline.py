@@ -168,24 +168,34 @@ def rank(title, triples, top_n=10):
     idx = np.argsort(final_scores)[::-1][:top_n]
     return [(triples[i]["raw"], float(final_scores[i])) for i in idx]
 
-def pipeline(csv_path):
+def pipeline(csv_path, top_n=10):
     df = pd.read_csv(csv_path, sep=";")
 
-    # For each title and its associated QIDs, we build the triples, rank them, and print the top results
+    all_results = []
+
     for _, row in df.iterrows():
         title = row["Title"]
-        qids = ast.literal_eval(row["QID"])
+
+        try:
+            qids = ast.literal_eval(row["QID"])
+        except:
+            raise ValueError(f"Erro ao parsear QID: {row['QID']}")
+
         qids = [f"Q{x}" if not str(x).startswith("Q") else x for x in qids]
 
         triples = build_triples(qids)
-        results = rank(title, triples, top_n=200)
 
-        print("TITLE:\n", title)
-        print(f"\nTriples used: {len(triples)}")
-        print("\nTriples - Top Results:\n")
+        results = rank(title, triples, top_n=top_n)
 
-        for t, s in results:
-            print(f"{s:.4f} | {t}")
+        all_results.append({
+            "title": title,
+            "triples_used": len(triples),
+            "top_results": [
+                {"triple": t, "score": s} for t, s in results
+            ]
+        })
+
+    return all_results
 
 if __name__ == "__main__":
     path = BASE_DIR / "backend" / "data" / "csv" / "test_dblp.csv"

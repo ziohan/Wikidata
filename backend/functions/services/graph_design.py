@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from textwrap import wrap
 
+# Getting all the qids from the list of triplets and normalizing them
 def normalize_qid_list(qid_value):
     if isinstance(qid_value, list):
         values = qid_value
@@ -29,10 +30,12 @@ def normalize_qid_list(qid_value):
         clean_qids.append(x)
     return clean_qids
 
+# Break the text into multiple lines for better display in the graph
 def short_label(text, width=14):
     return "\n".join(wrap(str(text), width=width))
 
-def deduplicate_keep_order(seq):
+# Remove duplicates
+def duplicates_order(seq):
     seen = set()
     out = []
     for x in seq:
@@ -41,6 +44,7 @@ def deduplicate_keep_order(seq):
             out.append(x)
     return out
 
+# Uses predicate weight and object count to assign a score to each triple, then ranks them
 PREFERRED_PREDICATES = {
     "instance of",
     "subclass of",
@@ -59,9 +63,6 @@ GENERIC_TERMS = {
     "method", "record", "writing", "information", "type of document"
 }
 
-# ---------------------------------------------------
-# Helpers de layout arbre
-# ---------------------------------------------------
 def compute_predicate_weight(pred_block):
     """Poids vertical d'un prédicat = max(1, nb objets)"""
     return max(1, len(pred_block["objects"]))
@@ -115,253 +116,234 @@ def assign_subtree_positions(pos, entity_block, side, entity_y, x_entity, x_pred
 
         current_top -= w * pred_gap
 
-def graph_design(UniqueList3, listtripletslabel, data):
+def graph_design(UniqueList3, listtripletslabel, data, query_id):
     plt.rcParams["figure.figsize"] = (24, 16)
     plt.rcParams["font.family"] = "DejaVu Sans"
     plt.rcParams["axes.facecolor"] = "white"
 
-    dataset_list = ["DBLP1"]
     path_results = "./KG_papers_tree_layout/"
     os.makedirs(path_results, exist_ok=True)
 
-    # ---------------------------------------------------
-    # Boucle principale
-    # ---------------------------------------------------
-    for fileName in dataset_list:
-        ListeEntity = UniqueList3
-        ListeTripletLabel = listtripletslabel
+    ListeEntity = UniqueList3
+    ListeTripletLabel = listtripletslabel
 
-        file = data.copy()
-        file = file.dropna(subset=["Title", "QID"]).reset_index(drop=True)
+    file = data.copy()
+    file = file.dropna(subset=["Title", "QID"]).reset_index(drop=True)
 
-        for i in range(file.shape[0]):
-            doc_id = f"Doc-{i}"
-            title = file.loc[i, "Title"]
-            doc_qids = normalize_qid_list(file.loc[i, "QID"])
-            list_index = [idx for idx, qid in enumerate(ListeEntity) if qid in doc_qids]
+    i = 0
+    doc_id = f"Doc-{i}"
+    title = file.loc[i, "Title"]
+    doc_qids = normalize_qid_list(file.loc[i, "QID"])
+    list_index = [idx for idx, qid in enumerate(ListeEntity) if qid in doc_qids]
 
-            doc_entities = []
+    doc_entities = []
 
-            for j in list_index:
-                if j >= len(ListeTripletLabel):
-                    continue
+    for j in list_index:
+        if j >= len(ListeTripletLabel):
+            continue
 
-                triplet_labels = ListeTripletLabel[j]
-                if not triplet_labels:
-                    continue
+        triplet_labels = ListeTripletLabel[j]
+        if not triplet_labels:
+            continue
 
-                entity_label = triplet_labels[0][0].strip()
-                if entity_label.lower() in GENERIC_TERMS:
-                    continue
+        entity_label = triplet_labels[0][0].strip()
+        if entity_label.lower() in GENERIC_TERMS:
+            continue
 
-                grouped_predicates = {}
-                for t in triplet_labels:
-                    if len(t) < 3:
-                        continue
-
-                    subj, pred, obj = t[0].strip(), t[1].strip(), t[2].strip()
-
-                    if not obj or obj.lower() in GENERIC_TERMS:
-                        continue
-
-                    grouped_predicates.setdefault(pred, [])
-                    if obj not in grouped_predicates[pred]:
-                        grouped_predicates[pred].append(obj)
-
-                if grouped_predicates:
-                    doc_entities.append({
-                        "entity": entity_label,
-                        "predicates": grouped_predicates
-                    })
-
-            # enlever doublons d'entités
-            unique_entities = []
-            seen_entities = set()
-            for ent in doc_entities:
-                if ent["entity"] not in seen_entities:
-                    seen_entities.add(ent["entity"])
-                    unique_entities.append(ent)
-
-            doc_entities = unique_entities
-
-            if not doc_entities:
+        grouped_predicates = {}
+        for t in triplet_labels:
+            if len(t) < 3:
                 continue
 
-            G = nx.DiGraph()
-            G.add_node(doc_id, node_type="document", display_label=doc_id)
+            subj, pred, obj = t[0].strip(), t[1].strip(), t[2].strip()
 
-            structured_entities = []
-
-            for entity_info in doc_entities:
-                entity_name = entity_info["entity"]
-                G.add_node(entity_name, node_type="entity", display_label=short_label(entity_name, 16))
-                G.add_edge(doc_id, entity_name)
-
-                predicates = list(entity_info["predicates"].items())
-                predicates = sorted(
-                    predicates,
-                    key=lambda x: (x[0] not in PREFERRED_PREDICATES, -len(x[1]), x[0])
-                )
-
-                entity_block = {
-                    "entity": entity_name,
-                    "predicates": []
-                }
-
-                for pred, obj_list in predicates:
-                    pred_node = f"{entity_name}__{pred}"
-                    clean_objects = deduplicate_keep_order(obj_list)
-
-                    G.add_node(pred_node, node_type="predicate", display_label=short_label(pred, 14))
-                    G.add_edge(entity_name, pred_node)
-
-                    obj_nodes = []
-                    for obj in clean_objects:
-                        obj_node = f"{pred_node}__{obj}"
-                        G.add_node(obj_node, node_type="object", display_label=short_label(obj, 14))
-                        G.add_edge(pred_node, obj_node)
-                        obj_nodes.append(obj_node)
-
-                    entity_block["predicates"].append({
-                        "pred_node": pred_node,
-                        "objects": obj_nodes
-                    })
-
-                structured_entities.append(entity_block)
-
-            if G.number_of_edges() == 0:
+            if not obj or obj.lower() in GENERIC_TERMS:
                 continue
 
-            # ---------------------------------------------------
-            # LAYOUT ARBRE SYMÉTRIQUE
-            # ---------------------------------------------------
-            pos = {}
-            pos[doc_id] = (0, 0)
+            grouped_predicates.setdefault(pred, [])
+            if obj not in grouped_predicates[pred]:
+                grouped_predicates[pred].append(obj)
 
-            # séparer gauche / droite
-            n = len(structured_entities)
-            left_entities = structured_entities[: math.ceil(n / 2)]
-            right_entities = structured_entities[math.ceil(n / 2):]
+        if grouped_predicates:
+            doc_entities.append({
+                "entity": entity_label,
+                "predicates": grouped_predicates
+            })
 
-            left_weights = [compute_entity_weight(e) for e in left_entities]
-            right_weights = [compute_entity_weight(e) for e in right_entities]
+    unique_entities = []
+    seen_entities = set()
+    for ent in doc_entities:
+        if ent["entity"] not in seen_entities:
+            seen_entities.add(ent["entity"])
+            unique_entities.append(ent)
 
-            left_total = sum(left_weights) if left_weights else 1
-            right_total = sum(right_weights) if right_weights else 1
+    doc_entities = unique_entities
 
-            # distances horizontales
-            x_entity = 3.0
-            x_pred = 6.8
-            x_obj = 10.6
+    if not doc_entities:
+        return None, None
 
-            # écart vertical global
-            entity_gap_unit = 2.0
+    G = nx.DiGraph()
+    G.add_node(doc_id, node_type="document", display_label=doc_id)
 
-            # côté gauche
-            current_top = (left_total - 1) * entity_gap_unit / 2
-            for entity_block, w in zip(left_entities, left_weights):
-                entity_center_y = current_top - (w - 1) * entity_gap_unit / 2
-                assign_subtree_positions(
-                    pos, entity_block, side=-1,
-                    entity_y=entity_center_y,
-                    x_entity=x_entity, x_pred=x_pred, x_obj=x_obj,
-                    pred_gap=1.8, obj_gap=1.15
-                )
-                current_top -= w * entity_gap_unit
+    structured_entities = []
 
-            # côté droit
-            current_top = (right_total - 1) * entity_gap_unit / 2
-            for entity_block, w in zip(right_entities, right_weights):
-                entity_center_y = current_top - (w - 1) * entity_gap_unit / 2
-                assign_subtree_positions(
-                    pos, entity_block, side=+1,
-                    entity_y=entity_center_y,
-                    x_entity=x_entity, x_pred=x_pred, x_obj=x_obj,
-                    pred_gap=1.8, obj_gap=1.15
-                )
-                current_top -= w * entity_gap_unit
+    for entity_info in doc_entities:
+        entity_name = entity_info["entity"]
+        G.add_node(entity_name, node_type="entity", display_label=short_label(entity_name, 16))
+        G.add_edge(doc_id, entity_name)
 
-            # ---------------------------------------------------
-            # Style
-            # ---------------------------------------------------
-            node_colors = []
-            node_sizes = []
-            labels = {}
+        predicates = list(entity_info["predicates"].items())
+        predicates = sorted(
+            predicates,
+            key=lambda x: (x[0] not in PREFERRED_PREDICATES, -len(x[1]), x[0])
+        )
 
-            for n_node, attrs in G.nodes(data=True):
-                ntype = attrs["node_type"]
-                labels[n_node] = attrs["display_label"]
+        entity_block = {
+            "entity": entity_name,
+            "predicates": []
+        }
 
-                if ntype == "document":
-                    node_colors.append("#2E7D32")
-                    node_sizes.append(4200)
-                elif ntype == "entity":
-                    node_colors.append("#F57C00")
-                    node_sizes.append(2600)
-                elif ntype == "predicate":
-                    node_colors.append("#FFEB3B")
-                    node_sizes.append(1900)
-                else:
-                    node_colors.append("#29B6F6")
-                    node_sizes.append(1700)
+        for pred, obj_list in predicates:
+            pred_node = f"{entity_name}__{pred}"
+            clean_objects = duplicates_order(obj_list)
 
-            # taille figure selon hauteur du graphe
-            ys = [p[1] for p in pos.values()]
-            y_span = max(ys) - min(ys) if ys else 10
-            fig_h = max(12, 0.9 * y_span + 6)
-            fig_w = 20
+            G.add_node(pred_node, node_type="predicate", display_label=short_label(pred, 14))
+            G.add_edge(entity_name, pred_node)
 
-            plt.figure(figsize=(fig_w, fig_h))
-            ax = plt.gca()
-            ax.set_facecolor("white")
+            obj_nodes = []
+            for obj in clean_objects:
+                obj_node = f"{pred_node}__{obj}"
+                G.add_node(obj_node, node_type="object", display_label=short_label(obj, 14))
+                G.add_edge(pred_node, obj_node)
+                obj_nodes.append(obj_node)
 
-            # arêtes
-            nx.draw_networkx_edges(
-                G, pos,
-                arrows=True,
-                arrowstyle="-|>",
-                arrowsize=12,
-                edge_color="black",
-                width=1.8,
-                alpha=0.95,
-                connectionstyle="arc3,rad=0.0"
-            )
+            entity_block["predicates"].append({
+                "pred_node": pred_node,
+                "objects": obj_nodes
+            })
 
-            # nœuds
-            nx.draw_networkx_nodes(
-                G, pos,
-                node_color=node_colors,
-                node_size=node_sizes,
-                edgecolors="#444444",
-                linewidths=1.0,
-                node_shape="o"
-            )
+        structured_entities.append(entity_block)
 
-            # labels
-            nx.draw_networkx_labels(
-                G, pos,
-                labels=labels,
-                font_size=7,
-                font_weight="bold",
-                font_family="DejaVu Sans"
-            )
+    if G.number_of_edges() == 0:
+        return None, None
 
-            plt.title(
-                f"Knowledge Graph for {fileName} - {doc_id}",
-                fontsize=16,
-                fontweight="bold",
-                pad=18
-            )
+    pos = {}
+    pos[doc_id] = (0, 0)
 
-            short_title = "\n".join(wrap(title, width=110))
-            plt.figtext(0.5, 0.02, short_title, ha="center", fontsize=9)
+    n = len(structured_entities)
+    left_entities = structured_entities[: math.ceil(n / 2)]
+    right_entities = structured_entities[math.ceil(n / 2):]
 
-            plt.axis("off")
-            plt.subplots_adjust(left=0.04, right=0.96, top=0.90, bottom=0.08)
+    left_weights = [compute_entity_weight(e) for e in left_entities]
+    right_weights = [compute_entity_weight(e) for e in right_entities]
 
-            save_pdf = os.path.join(path_results, f"{fileName}_{i}_tree.pdf")
-            save_png = os.path.join(path_results, f"{fileName}_{i}_tree.png")
+    left_total = sum(left_weights) if left_weights else 1
+    right_total = sum(right_weights) if right_weights else 1
 
-            plt.savefig(save_pdf, format="pdf", dpi=600, bbox_inches="tight", facecolor="white")
-            plt.savefig(save_png, format="png", dpi=400, bbox_inches="tight", facecolor="white")
-            plt.show()
+    x_entity = 3.0
+    x_pred = 6.8
+    x_obj = 10.6
+
+    entity_gap_unit = 2.0
+
+    current_top = (left_total - 1) * entity_gap_unit / 2
+    for entity_block, w in zip(left_entities, left_weights):
+        entity_center_y = current_top - (w - 1) * entity_gap_unit / 2
+        assign_subtree_positions(
+            pos, entity_block, side=-1,
+            entity_y=entity_center_y,
+            x_entity=x_entity, x_pred=x_pred, x_obj=x_obj,
+            pred_gap=1.8, obj_gap=1.15
+        )
+        current_top -= w * entity_gap_unit
+
+    current_top = (right_total - 1) * entity_gap_unit / 2
+    for entity_block, w in zip(right_entities, right_weights):
+        entity_center_y = current_top - (w - 1) * entity_gap_unit / 2
+        assign_subtree_positions(
+            pos, entity_block, side=+1,
+            entity_y=entity_center_y,
+            x_entity=x_entity, x_pred=x_pred, x_obj=x_obj,
+            pred_gap=1.8, obj_gap=1.15
+        )
+        current_top -= w * entity_gap_unit
+
+    node_colors = []
+    node_sizes = []
+    labels = {}
+
+    for n_node, attrs in G.nodes(data=True):
+        ntype = attrs["node_type"]
+        labels[n_node] = attrs["display_label"]
+
+        if ntype == "document":
+            node_colors.append("#2E7D32")
+            node_sizes.append(4200)
+        elif ntype == "entity":
+            node_colors.append("#F57C00")
+            node_sizes.append(2600)
+        elif ntype == "predicate":
+            node_colors.append("#FFEB3B")
+            node_sizes.append(1900)
+        else:
+            node_colors.append("#29B6F6")
+            node_sizes.append(1700)
+
+    ys = [p[1] for p in pos.values()]
+    y_span = max(ys) - min(ys) if ys else 10
+    fig_h = max(12, 0.9 * y_span + 6)
+    fig_w = 20
+
+    plt.figure(figsize=(fig_w, fig_h))
+    ax = plt.gca()
+    ax.set_facecolor("white")
+
+    nx.draw_networkx_edges(
+        G, pos,
+        arrows=True,
+        arrowstyle="-|>",
+        arrowsize=12,
+        edge_color="black",
+        width=1.8,
+        alpha=0.95,
+        connectionstyle="arc3,rad=0.0"
+    )
+
+    nx.draw_networkx_nodes(
+        G, pos,
+        node_color=node_colors,
+        node_size=node_sizes,
+        edgecolors="#444444",
+        linewidths=1.0,
+        node_shape="o"
+    )
+
+    nx.draw_networkx_labels(
+        G, pos,
+        labels=labels,
+        font_size=7,
+        font_weight="bold",
+        font_family="DejaVu Sans"
+    )
+
+    plt.title(
+        f"Knowledge Graph - {doc_id}",
+        fontsize=16,
+        fontweight="bold",
+        pad=18
+    )
+
+    short_title = "\n".join(wrap(title, width=110))
+    plt.figtext(0.5, 0.02, short_title, ha="center", fontsize=9)
+
+    plt.axis("off")
+    plt.subplots_adjust(left=0.04, right=0.96, top=0.90, bottom=0.08)
+
+    save_png = os.path.join(path_results, f"{query_id}.png")
+    save_pdf = os.path.join(path_results, f"{query_id}.pdf")
+
+    plt.savefig(save_pdf, format="pdf", dpi=600, bbox_inches="tight", facecolor="white")
+    plt.savefig(save_png, format="png", dpi=400, bbox_inches="tight", facecolor="white")
+
+    plt.close()
+    return str(save_png), str(save_pdf)
