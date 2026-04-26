@@ -1,0 +1,48 @@
+<div class="page">
+
+  <div class="container">
+
+    <h1 class="title">Query Generated</h1>
+
+    <!-- TITLE -->
+    <div class="card">
+      <h2 class="section-title">Title</h2>
+      <p class="value">{{ title() }}</p>
+    </div>
+
+    <!-- GRAPH -->
+    <div class="card center">
+
+      <h2 class="section-title">Graph</h2>
+
+      <img class="graph-img" [src]="graph()" alt="graph" />
+
+      <div class="btn-row">
+        <a class="btn" [href]="graph()" download>Download PNG</a>
+        <a class="btn" [href]="pdf()" download>Download PDF</a>
+      </div>
+
+    </div>
+
+    <!-- TRIPLES -->
+    <div class="card center">
+
+      <h2 class="section-title">Triples</h2>
+
+      <div class="triples">
+        <p *ngFor="let t of triples()">{{ t }}</p>
+      </div>
+
+      <button class="btn" (click)="downloadTriples()">
+        Download TXT
+      </button>
+
+    </div>
+
+    <!-- NEXT -->
+    <div class="footer">
+      <button class="btn-next" (click)="next()">Next</button>
+    </div>
+
+  </div>
+</div>

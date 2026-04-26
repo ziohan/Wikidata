@@ -1,0 +1,106 @@
+.page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #8e2de2, #4a00e0);
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.container {
+  width: 100%;
+  max-width: 900px;
+}
+
+.title {
+  text-align: center;
+  color: white;
+  font-size: 34px;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.center {
+  text-align: center;
+}
+
+.section-title {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.value {
+  font-size: 18px;
+}
+
+.graph-img {
+  max-width: 100%;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+/* 🔥 BOTÕES UNIFICADOS */
+.btn {
+  background: white;
+  color: #4a00e0;
+  border: none;
+  padding: 10px 16px;
+  margin: 5px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  text-decoration: none;
+  display: inline-block;
+  transition: 0.2s;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+}
+
+/* GRAPH BUTTON ROW */
+.btn-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* TRIPLES */
+.triples {
+  text-align: left;
+  max-height: 250px;
+  overflow-y: auto;
+  margin-bottom: 15px;
+}
+
+/* NEXT BUTTON */
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.btn-next {
+  background: #00e676;
+  color: black;
+  font-weight: bold;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-next:hover {
+  transform: scale(1.05);
+}

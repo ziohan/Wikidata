@@ -1,0 +1,28 @@
+<div class="page">
+  <div class="card">
+    <h1 class="title">New Query</h1>
+    <div class="form">
+      <label>Upload CSV</label>
+      <input type="file" (change)="onFileSelected($event)" class="input" />
+      <label>Number of Hops</label>
+      <input type="number" [(ngModel)]="hops" class="input" />
+      <label>Number of Triples</label>
+      <input type="number" [(ngModel)]="triplesCount" class="input" />
+      <div class="buttons">
+        <button class="btn secondary" (click)="goBack()">
+          ⬅ Back
+        </button>
+        <button class="btn primary" (click)="submitQuery()">
+          Execute Query
+        </button>
+      </div>
+      <pre class="response" *ngIf="response()">
+{{response()}}
+      </pre>
+      <div class="error" *ngIf="error()">
+        {{error()}}
+      </div>
+
+    </div>
+  </div>
+</div>
