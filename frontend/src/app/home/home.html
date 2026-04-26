@@ -12,10 +12,14 @@
         <span class="icon">➕</span>
         <span>New Query</span>
       </button>
-      <button class="card-btn" (click)="goToHistory()">
+      <button class="card-btn" (click)="openHistory()">
         <span class="icon">📄</span>
         <span>History</span>
       </button>
     </div>
   </div>
 </div>
+<app-popup-history
+  *ngIf="showHistory()"
+  (close)="closeHistory()">
+</app-popup-history>

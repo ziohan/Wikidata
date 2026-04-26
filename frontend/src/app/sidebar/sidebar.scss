@@ -1,19 +1,14 @@
-/* BOTÃO ☰ FORA DA SIDEBAR */
 .hamburger {
   position: fixed;
   top: 18px;
   left: 18px;
-
   font-size: 28px;
   color: white;
-
   cursor: pointer;
-  z-index: 4000;
-
+  z-index: 6000;
   user-select: none;
 }
 
-/* botão dentro da sidebar */
 .hamburger.inside {
   position: absolute;
   top: 18px;
@@ -22,90 +17,69 @@
   color: white;
 }
 
-/* OVERLAY */
 .overlay {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.45);
-  z-index: 2000;
+  z-index: 4990;
 }
 
-/* SIDEBAR */
 .sidebar {
   position: fixed;
   top: 0;
   left: -280px;
-
   width: 280px;
   height: 100%;
-
   background: linear-gradient(180deg, #7b2cbf, #5a189a);
-
   padding: 70px 20px 20px 20px;
-
   transition: left 0.3s ease, opacity 0.3s ease;
-
   opacity: 0;
   pointer-events: none;
-
-  z-index: 3000;
+  z-index: 5000;
 }
 
-/* aberta */
 .sidebar.open {
   left: 0;
   opacity: 1;
   pointer-events: auto;
 }
 
-/* MENU */
 .menu {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-/* ITENS PRINCIPAIS */
 .item {
   color: white;
   font-size: 17px;
   font-weight: 600;
-
   padding: 10px 12px;
   border-radius: 10px;
-
   background: transparent;
   border: none;
-
   text-align: left;
-
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s
 }
 
 .item:hover {
   background: rgba(255,255,255,0.15);
 }
 
-/* HISTORY (mesmo estilo, mas não clicável) */
 .no-click {
   opacity: 0.9;
   cursor: default;
 }
 
-/* SUB ITENS */
 .sub-item {
   color: white;
   font-size: 15px;
-
   padding: 8px 12px 8px 28px;
   border-radius: 10px;
-
   background: transparent;
   border: none;
-
   text-align: left;
-
   cursor: pointer;
   transition: background 0.2s;
 }
