@@ -1,0 +1,49 @@
+<!-- BOTÃO ☰ (só aparece quando fechada) -->
+<div
+  class="hamburger"
+  *ngIf="!isOpen()"
+  (click)="toggleMenu()"
+>
+  ☰
+</div>
+
+<!-- OVERLAY -->
+<div class="overlay" *ngIf="isOpen()" (click)="closeMenu()"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" [class.open]="isOpen()">
+
+  <!-- botão dentro da sidebar quando aberta -->
+  <div class="hamburger inside" *ngIf="isOpen()" (click)="toggleMenu()">
+    ☰
+  </div>
+
+  <div class="menu">
+
+    <button class="item" (click)="navigate('')">Home</button>
+
+    <button class="item" (click)="navigate('/new-query')">
+      New Query
+    </button>
+
+    <div class="item no-click">History</div>
+
+    <button class="sub-item" (click)="navigate('/search-entities')">
+      Search Entities
+    </button>
+
+    <button class="sub-item" (click)="navigate('/top-queries')">
+      Top Queries
+    </button>
+
+    <button class="sub-item" (click)="navigate('/last-queries')">
+      Last Queries
+    </button>
+
+    <button class="item" (click)="navigate('/settings')">
+      Settings
+    </button>
+
+  </div>
+
+</div>

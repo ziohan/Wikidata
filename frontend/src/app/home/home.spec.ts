@@ -1,15 +1,15 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { QueryGenerated } from './query-generated';
+import { Home } from './home';
 
-describe('QueryGenerated', () => {
-  let component: QueryGenerated;
-  let fixture: ComponentFixture<QueryGenerated>;
+describe('Home', () => {
+  let component: Home;
+  let fixture: ComponentFixture<Home>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [QueryGenerated],
+      imports: [Home],
     }).compileComponents();
-    fixture = TestBed.createComponent(QueryGenerated);
+    fixture = TestBed.createComponent(Home);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
