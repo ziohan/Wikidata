@@ -1,25 +1,15 @@
-<!-- OVERLAY -->
 <div class="overlay" (click)="closeModal()"></div>
-
-<!-- MODAL -->
 <div class="modal" (click)="$event.stopPropagation()">
-
   <button class="close-btn" (click)="closeModal()">✕</button>
-
   <div class="content">
-
     <button class="item" (click)="go('/search-entities')">
       🔎 Search Entities
     </button>
-
     <button class="item" (click)="go('/top-queries')">
       🏆 Top Queries
     </button>
-
     <button class="item" (click)="go('/last-queries')">
       📅 Last Queries
     </button>
-
   </div>
-
 </div>

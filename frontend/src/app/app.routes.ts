@@ -4,6 +4,7 @@ import { QueryGenerated } from './query-generated/query-generated';
 import { Home } from './home/home';
 import { LastQueries } from './last-queries/last-queries';
 import { QueryData } from './query-data/query-data';
+import { SearchEntities } from './search-entities/search-entities';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -13,4 +14,5 @@ export const routes: Routes = [
   { path: 'settings', component: Home },
   { path: 'history', component: Home },
   { path: 'query/:id', component: QueryData },
+  { path: 'search-entities', component: SearchEntities },
 ];

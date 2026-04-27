@@ -27,6 +27,13 @@ def create_schema():
     """)
 
     cursor.execute("""
+    CREATE TABLE IF NOT EXISTS entity_favorites (
+        qid TEXT PRIMARY KEY,
+        FOREIGN KEY(qid) REFERENCES entities(qid)
+    )
+    """)
+
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS query_results (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         query_id TEXT NOT NULL,

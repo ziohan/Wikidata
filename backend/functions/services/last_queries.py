@@ -9,9 +9,6 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 DB_PATH = BASE_DIR / "data" / "wikidata.db"
 
 
-# =========================
-# GET LAST QUERIES
-# =========================
 @router.get("/last-queries")
 def get_last_queries(
     page: int = 1,
@@ -24,38 +21,28 @@ def get_last_queries(
 
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-
     offset = (page - 1) * page_size
-
     base_sql = """
         FROM queries q
         WHERE 1=1
     """
-
     params = []
-
     if search:
         base_sql += " AND q.title LIKE ?"
         params.append(f"%{search}%")
-
     if favorite:
         base_sql += " AND q.favorite = 1"
-
     if start_date:
         base_sql += " AND date(q.created_at) >= date(?)"
         params.append(start_date)
-
     if end_date:
         base_sql += " AND date(q.created_at) <= date(?)"
         params.append(end_date)
 
-    # total
     cursor.execute(f"SELECT COUNT(*) {base_sql}", params)
     total = cursor.fetchone()[0]
-
     total_pages = max(1, math.ceil(total / page_size))
 
-    # dados
     sql = f"""
         SELECT q.id, q.title, q.hops, q.top_n, q.created_at, q.favorite,
         (SELECT COUNT(*) FROM query_results r WHERE r.query_id = q.id) as triple_count
@@ -79,6 +66,7 @@ def get_last_queries(
                 "favorite": bool(r[5]),
                 "triples": r[6]
             }
+                    
             for r in rows
         ],
         "pagination": {
@@ -89,20 +77,13 @@ def get_last_queries(
         }
     }
 
-
-# =========================
-# TOGGLE FAVORITE
-# =========================
 @router.patch("/queries/{query_id}/favorite")
 def toggle_favorite(query_id: str):
-
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-
     cursor.execute("""
         SELECT favorite FROM queries WHERE id = ?
     """, (query_id,))
-
     row = cursor.fetchone()
 
     if not row:
@@ -110,13 +91,11 @@ def toggle_favorite(query_id: str):
         return {"error": "Query not found"}
 
     new_value = 0 if row[0] == 1 else 1
-
     cursor.execute("""
         UPDATE queries
         SET favorite = ?
         WHERE id = ?
     """, (new_value, query_id))
-
     conn.commit()
     conn.close()
 
@@ -124,3 +103,14 @@ def toggle_favorite(query_id: str):
         "id": query_id,
         "favorite": new_value
     }
+
+@router.delete("/queries/{query_id}")
+def delete_query(query_id: str):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM query_results WHERE query_id = ?", (query_id,))
+    cursor.execute("DELETE FROM queries WHERE id = ?", (query_id,))
+    conn.commit()
+    conn.close()
+    return {"deleted": True, "id": query_id}

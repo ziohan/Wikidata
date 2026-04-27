@@ -1,8 +1,9 @@
 import sqlite3
 import pandas as pd
+import time
 from pathlib import Path
 from backend.functions.services.entity_linker import entity_linker
-from backend.functions.services.extract_triples import extracttriples, est_triplet_valide
+from backend.functions.services.extract_triples import (extracttriples, est_triplet_valide, extraire_ids_unique, recuperer_labels_batch)
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 DB_PATH = BASE_DIR / "data" / "wikidata.db"
@@ -55,16 +56,22 @@ def import_data():
 
         valid_triples = [t for t in triples if est_triplet_valide(t)]
         update_cache(cursor, qid, len(valid_triples))
+        ids = extraire_ids_unique(valid_triples)
+        batch_size = 200
+        labels = {}
+        for j in range(0, len(ids), batch_size):
+            batch = ids[j: j + batch_size]
+            try:
+                batch_labels = recuperer_labels_batch(batch)
+                labels.update(batch_labels)
+                time.sleep(1.2)
+            except Exception as e:
+                print("Label fetch error:", e)
 
         for s, p, o in valid_triples:
-            # entities
-            insert_entity(cursor, s)
-            insert_entity(cursor, o)
-
-            # predicate
-            insert_predicate(cursor, p)
-
-            # triple
+            insert_entity(cursor, s, labels.get(s, ""))
+            insert_entity(cursor, o, labels.get(o, ""))
+            insert_predicate(cursor, p, labels.get(p, ""))
             insert_triple(cursor, s, p, o)
 
         conn.commit()
