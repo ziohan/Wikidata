@@ -1,0 +1,58 @@
+<div class="page">
+  <h1>Last Queries</h1>
+  <div class="filters">
+    <input placeholder="Search title"
+           [(ngModel)]="search"
+           (input)="load()" />
+    <button class="star-btn" [class.active]="favorite" (click)="favorite = !favorite; load()">
+      ⭐
+    </button>
+    <input type="date" [(ngModel)]="start_date" (change)="load()" />
+    <input type="date" [(ngModel)]="end_date" (change)="load()" />
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th class="col-title">Title</th>
+        <th class="col-hops">Hops</th>
+        <th class="col-triples">Triples</th>
+        <th class="col-date">Date</th>
+        <th class="col-fav">Favorite</th>
+        <th class="col-view">Visualize</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let q of queries()">
+        <td class="col-title" [title]="q.title">
+          {{ q.title }}
+        </td>
+        <td class="col-hops">{{ q.hops }}</td>
+        <td class="col-triples">{{ q.triples }}</td>
+        <td class="col-date">
+          {{ q.created_at | date:'dd/MM/yyyy HH:mm:ss' }}
+        </td>
+        <td class="col-fav">
+          <button class="fav-btn" (click)="toggleFavorite(q.id)">
+            {{ q.favorite ? '⭐' : '☆' }}
+          </button>
+        </td>
+        <td class="col-view">
+          <button class="view-btn" (click)="visualize(q.id)">
+            🔍
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="pagination">
+    <button (click)="changePage(page - 1)" [disabled]="page <= 1">
+      ◀
+    </button>
+    <span>
+      Page {{ page }}
+    </span>
+    <button (click)="changePage(page + 1)" [disabled]="queries().length < 10">
+      ▶
+    </button>
+  </div>
+</div>

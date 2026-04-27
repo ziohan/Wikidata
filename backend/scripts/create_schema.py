@@ -101,9 +101,15 @@ def create_schema():
     """)
 
     cursor.execute("""
-    CREATE INDEX IF NOT EXISTS idx_query_results_query_id
-    ON query_results(query_id)
+    PRAGMA table_info(queries)
     """)
+
+    columns = [col[1] for col in cursor.fetchall()]
+
+    if "favorite" not in columns:
+        cursor.execute("""
+        ALTER TABLE queries ADD COLUMN favorite INTEGER DEFAULT 0
+        """)
 
     conn.commit()
     conn.close()

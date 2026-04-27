@@ -9,14 +9,22 @@ import { Router } from '@angular/router';
   templateUrl: './popup-history.html',
   styleUrl: './popup-history.scss'
 })
-
 export class PopupHistory {
+
   @Output() close = new EventEmitter<void>();
+
   private router = inject(Router);
+
   go(path: string) {
-    this.router.navigate([path]);
+    // 👇 fecha primeiro (evita glitch visual)
     this.close.emit();
+
+    // 👇 pequena garantia de timing
+    setTimeout(() => {
+      this.router.navigate([path]);
+    }, 0);
   }
+
   closeModal() {
     this.close.emit();
   }
