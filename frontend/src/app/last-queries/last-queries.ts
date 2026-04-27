@@ -47,13 +47,12 @@ export class LastQueries {
     });
   }
   
-  
   toggleFavorite(id: string) {
     this.service.toggleFavorite(id).subscribe(() => this.load());
   }
 
   visualize(id: string) {
-    this.router.navigate([`/query-visualize/${id}`]);
+    this.router.navigate([`/query/${id}`]);
   }
 
   changePage(p: number) {
