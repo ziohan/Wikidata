@@ -34,21 +34,23 @@ export class LastQueries {
       start_date: this.start_date,
       end_date: this.end_date,
       page: this.page,
-      page_size: 10
+      page_size: this.page_size
     }).subscribe({
       next: (res) => {
-        console.log('DATA:', res);
         this.queries.set(res.data || []);
         this.pagination.set(res.pagination || {});
-      },
-      error: (err) => {
-        console.error('ERRO BACKEND:', err);
       }
     });
   }
-  
+
   toggleFavorite(id: string) {
     this.service.toggleFavorite(id).subscribe(() => this.load());
+  }
+
+  deleteQuery(id: string) {
+    if (!confirm('Delete this query?')) return;
+
+    this.service.deleteQuery(id).subscribe(() => this.load());
   }
 
   visualize(id: string) {
@@ -57,12 +59,6 @@ export class LastQueries {
 
   changePage(p: number) {
     this.page = p;
-    this.load();
-  }
-
-  changeSize(size: number) {
-    this.page_size = size;
-    this.page = 1;
     this.load();
   }
 }

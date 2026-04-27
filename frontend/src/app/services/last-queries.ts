@@ -24,4 +24,8 @@ export class LastQueriesService {
   toggleFavorite(id: string) {
     return this.http.patch(`${this.base}/queries/${id}/favorite`, {});
   }
+
+  deleteQuery(id: string) {
+    return this.http.delete(`${this.base}/queries/${id}`);
+  }
 }

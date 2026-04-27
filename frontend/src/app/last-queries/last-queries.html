@@ -11,38 +11,44 @@
     <input type="date" [(ngModel)]="end_date" (change)="load()" />
   </div>
   <table>
-    <thead>
-      <tr>
-        <th class="col-title">Title</th>
-        <th class="col-hops">Hops</th>
-        <th class="col-triples">Triples</th>
-        <th class="col-date">Date</th>
-        <th class="col-fav">Favorite</th>
-        <th class="col-view">Visualize</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let q of queries()">
-        <td class="col-title" [title]="q.title">
-          {{ q.title }}
-        </td>
-        <td class="col-hops">{{ q.hops }}</td>
-        <td class="col-triples">{{ q.triples }}</td>
-        <td class="col-date">
-          {{ q.created_at | date:'dd/MM/yyyy HH:mm:ss' }}
-        </td>
-        <td class="col-fav">
-          <button class="fav-btn" (click)="toggleFavorite(q.id)">
-            {{ q.favorite ? '⭐' : '☆' }}
-          </button>
-        </td>
-        <td class="col-view">
-          <button class="view-btn" (click)="visualize(q.id)">
-            🔍
-          </button>
-        </td>
-      </tr>
-    </tbody>
+  <thead>
+    <tr>
+      <th class="col-title">Title</th>
+      <th class="col-hops">Hops</th>
+      <th class="col-triples">Triples</th>
+      <th class="col-date">Date</th>
+      <th class="col-fav">Favorite</th>
+      <th class="col-view">Visualize</th>
+      <th class="col-delete">Delete</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let q of queries()">
+      <td class="col-title" [title]="q.title">
+        {{ q.title }}
+      </td>
+      <td class="col-hops">{{ q.hops }}</td>
+      <td class="col-triples">{{ q.triples }}</td>
+      <td class="col-date">
+        {{ q.created_at | date:'dd/MM/yyyy HH:mm:ss' }}
+      </td>
+      <td class="col-fav">
+        <button class="fav-btn" (click)="toggleFavorite(q.id)">
+          {{ q.favorite ? '⭐' : '☆' }}
+        </button>
+      </td>
+      <td class="col-view">
+        <button class="view-btn" (click)="visualize(q.id)">
+          🔍
+        </button>
+      </td>
+      <td class="col-delete">
+        <button class="delete-btn" (click)="deleteQuery(q.id)">
+          🗑
+        </button>
+      </td>
+    </tr>
+  </tbody>
   </table>
   <div class="pagination">
     <button (click)="changePage(page - 1)" [disabled]="page <= 1">
