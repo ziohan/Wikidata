@@ -45,10 +45,23 @@ def save_query_results(query_id, results):
     for item in results:
         for r in item["top_results"]:
             cur.execute("""
-                INSERT INTO query_results (query_id, triple, score)
-                VALUES (?, ?, ?)
-            """, (query_id, r["triple"], r["score"]))
-
+                INSERT INTO query_results (
+                    query_id,
+                    subject_qid,
+                    predicate_pid,
+                    object_qid,
+                    triple,
+                    score
+                )
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (
+                query_id,
+                r["subject_qid"],
+                r["predicate_pid"],
+                r["object_qid"],
+                r["triple"],
+                r["score"]
+            ))
     conn.commit()
     conn.close()
 

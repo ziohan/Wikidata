@@ -36,8 +36,11 @@ def create_schema():
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS query_results (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        query_id TEXT NOT NULL,
         triple TEXT NOT NULL,
+        query_id TEXT NOT NULL,
+        subject_qid TEXT NOT NULL,
+        predicate_pid TEXT NOT NULL,
+        object_qid TEXT,
         score REAL NOT NULL,
 
         FOREIGN KEY(query_id) REFERENCES queries(id)

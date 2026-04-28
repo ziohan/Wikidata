@@ -107,7 +107,10 @@ def build_triples(qids):
             "embed": embed,
             "predicate": p_l,
             "subject": s_l,
-            "object": o_l
+            "object": o_l,
+            "subject_qid": s,
+            "predicate_pid": p,
+            "object_qid": o,
         })
 
     return results
@@ -166,7 +169,7 @@ def rank(title, triples, top_n=10):
         score = base * weight
         final_scores.append(score)
     idx = np.argsort(final_scores)[::-1][:top_n]
-    return [(triples[i]["raw"], float(final_scores[i])) for i in idx]
+    return [(triples[i]["raw"], float(final_scores[i]), triples[i]["subject_qid"], triples[i]["predicate_pid"], triples[i]["object_qid"]) for i in idx]
 
 def pipeline(csv_path, top_n=10):
     df = pd.read_csv(csv_path, sep=";")
@@ -191,7 +194,7 @@ def pipeline(csv_path, top_n=10):
             "title": title,
             "triples_used": len(triples),
             "top_results": [
-                {"triple": t, "score": s} for t, s in results
+                {"triple": t, "score": s, "subject_qid": sq, "predicate_pid": pp, "object_qid": oq} for t, s, sq, pp, oq in results
             ]
         })
 
