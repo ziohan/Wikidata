@@ -1,0 +1,13 @@
+<div class="page">
+  <div class="card">
+    <h1>Settings</h1>
+    <label>Default Hops</label>
+    <input type="number" [(ngModel)]="formHops" />
+    <label>Default Top Triplets</label>
+    <input type="number" [(ngModel)]="formTopN" />
+    <button class="save" (click)="save()">💾 Save</button>
+    <button class="danger" (click)="clearQueries()">
+      🗑 Clear ALL Queries
+    </button>
+  </div>
+</div>

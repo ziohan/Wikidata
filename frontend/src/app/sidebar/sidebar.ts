@@ -10,11 +10,8 @@ import { Router } from '@angular/router';
   styleUrl: './sidebar.scss'
 })
 export class Sidebar {
-
   private router = inject(Router);
-
   isOpen = signal(false);
-
   toggleMenu() {
     this.isOpen.update(v => !v);
   }
@@ -25,7 +22,7 @@ export class Sidebar {
 
   navigate(path: string) {
     this.router.navigate([path]).then(() => {
-      this.closeMenu(); // 👈 garante fechar após navegação
+      this.closeMenu(); 
     });
   }
 }

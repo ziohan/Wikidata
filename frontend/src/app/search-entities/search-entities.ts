@@ -11,22 +11,16 @@ import { Router } from '@angular/router';
   imports: [CommonModule, FormsModule]
 })
 export class SearchEntities {
-
   private http = inject(HttpClient);
   private router = inject(Router);
-
   entities = signal<any[]>([]);
-
   page = 1;
   page_size = 10;
   total_pages = 1;
-
   search = '';
   favorite = false;
-
   sort_by = 'occurrences';
   order = 'desc';
-
   ngOnInit() {
     this.load();
   }
@@ -66,7 +60,6 @@ export class SearchEntities {
     this.http.patch(`http://127.0.0.1:8000/entities/${qid}/favorite`, {})
       .subscribe(() => this.load());
   }
-
 
   visualize(qid: string) {
     this.router.navigate([`/entity/${qid}`]);

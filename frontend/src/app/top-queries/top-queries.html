@@ -1,8 +1,5 @@
 <div class="page">
-
   <h1>🏆 Top Queries Dashboard</h1>
-
-  <!-- SUBJECTS -->
   <h2>Top Subjects</h2>
   <table>
     <tr>
@@ -10,15 +7,12 @@
       <th>Label</th>
       <th>Occurrences</th>
     </tr>
-
     <tr *ngFor="let s of subjects()">
       <td>{{ s.qid }}</td>
       <td>{{ s.label }}</td>
       <td>{{ s.occurrences }}</td>
     </tr>
   </table>
-
-  <!-- PREDICATES -->
   <h2>Top Predicates</h2>
   <table>
     <tr>
@@ -26,15 +20,12 @@
       <th>Label</th>
       <th>Occurrences</th>
     </tr>
-
     <tr *ngFor="let p of predicates()">
       <td>{{ p.pid }}</td>
       <td>{{ p.label }}</td>
       <td>{{ p.occurrences }}</td>
     </tr>
   </table>
-
-  <!-- TRIPLETS -->
   <h2>Top Triplets</h2>
   <table>
     <tr>
@@ -42,12 +33,10 @@
       <th>Average Score</th>
       <th>Occurrences</th>
     </tr>
-
     <tr *ngFor="let t of triplets()">
       <td>{{ t.triple }}</td>
       <td>{{ t.avg_score }}</td>
       <td>{{ t.occurrences }}</td>
     </tr>
   </table>
-
 </div>

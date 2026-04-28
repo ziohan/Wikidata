@@ -5,9 +5,9 @@
       <label>Upload CSV</label>
       <input type="file" (change)="onFileSelected($event)" class="input" />
       <label>Number of Hops</label>
-      <input type="number" [(ngModel)]="hops" class="input" />
+      <input type="number" [(ngModel)]="formHops" class="input" />
       <label>Number of Triples</label>
-      <input type="number" [(ngModel)]="triplesCount" class="input" />
+      <input type="number" [(ngModel)]="formTopN" class="input" />
       <div class="buttons">
         <button class="btn secondary" (click)="goBack()">
           ⬅ Back
