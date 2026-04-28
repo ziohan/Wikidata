@@ -44,11 +44,9 @@ def search_entities(
     """
 
     params = []
-
     if search:
         base_sql += " AND (e.qid LIKE ? OR e.label LIKE ?)"
         params.extend([f"%{search}%", f"%{search}%"])
-
     if favorite:
         base_sql += " AND ef.qid IS NOT NULL"
 
@@ -57,16 +55,13 @@ def search_entities(
         "label": "e.label",
         "occurrences": "COALESCE(o.occurrences, 0)"
     }
-
     order_sql = f"""
         ORDER BY {sort_map.get(sort_by, 'COALESCE(o.occurrences,0)')} {order.upper()}
     """
-
     cursor.execute(f"""
         SELECT COUNT(*)
         {base_sql}
     """, params)
-
     total = cursor.fetchone()[0]
 
     cursor.execute(f"""
@@ -82,7 +77,6 @@ def search_entities(
 
     rows = cursor.fetchall()
     conn.close()
-
     return {
         "data": [
             {
@@ -101,17 +95,11 @@ def search_entities(
         }
     }
 
-
-# ============================
-# 🔥 NOVA FUNÇÃO: GRAPH DIRECTO
-# ============================
-
 @router.get("/entity-graph/{qid}")
 def entity_graph(qid: str):
     try:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
-
         cursor.execute("""
             SELECT subject_qid, predicate_pid, object_qid
             FROM triples
@@ -121,14 +109,11 @@ def entity_graph(qid: str):
 
         triples = cursor.fetchall()
         conn.close()
-
         if not triples:
             return {"error": "No triples found"}
 
         structured = [[s, p, o] for s, p, o in triples]
-
         df = pd.DataFrame([{"Title": qid, "QID": qid}])
-
         graph_design(
             [qid],
             [structured],
@@ -152,10 +137,67 @@ def graph_png(qid: str):
         return {"error": "not found"}
     return FileResponse(path, media_type="image/png")
 
-
 @router.get("/graph/{qid}/pdf")
 def graph_pdf(qid: str):
     path = GRAPH_DIR / f"{qid}.pdf"
     if not path.exists():
         return {"error": "not found"}
     return FileResponse(path, media_type="application/pdf")
+
+
+@router.get("/entity/{qid}")
+def get_entity_details(qid: str):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT COUNT(DISTINCT query_id)
+        FROM query_results
+        WHERE subject_qid = ?
+           OR object_qid = ?
+    """, (qid, qid))
+    occurrences = cursor.fetchone()[0]
+
+    cursor.execute("""
+        SELECT DISTINCT q.id, q.title, q.hops, q.top_n, q.created_at
+        FROM queries q
+        JOIN query_results r ON r.query_id = q.id
+        WHERE r.subject_qid = ?
+           OR r.object_qid = ?
+        ORDER BY q.created_at DESC
+    """, (qid, qid))
+    queries = cursor.fetchall()
+    data = []
+
+    for q in queries:
+        qid_query = q[0]
+        cursor.execute("""
+            SELECT triple, subject_qid, predicate_pid, object_qid, score
+            FROM query_results
+            WHERE query_id = ?
+              AND (subject_qid = ? OR object_qid = ?)
+        """, (qid_query, qid, qid))
+        triples = cursor.fetchall()
+        data.append({
+            "id": q[0],
+            "title": q[1],
+            "hops": q[2],
+            "top_n": q[3],
+            "created_at": q[4],
+            "triples": [
+                {
+                    "triple": t[0],
+                    "subject_qid": t[1],
+                    "predicate_pid": t[2],
+                    "object_qid": t[3],
+                    "score": t[4]
+                }
+                for t in triples
+            ]
+        })
+    conn.close()
+    
+    return {
+        "qid": qid,
+        "occurrences": occurrences,
+        "queries": data
+    }

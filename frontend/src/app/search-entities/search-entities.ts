@@ -1,14 +1,19 @@
 import { Component, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-search-entities',
   standalone: true,
-  templateUrl: './search-entities.html'
+  templateUrl: './search-entities.html',
+  styleUrl: './search-entities.scss',
+  imports: [CommonModule, FormsModule]
 })
 export class SearchEntities {
 
   private http = inject(HttpClient);
+  private router = inject(Router);
 
   entities = signal<any[]>([]);
 
@@ -62,10 +67,8 @@ export class SearchEntities {
       .subscribe(() => this.load());
   }
 
+
   visualize(qid: string) {
-    this.http.get<any>(`http://127.0.0.1:8000/entity-graph/${qid}`)
-      .subscribe(res => {
-        window.open(`http://127.0.0.1:8000${res.image_url}`, '_blank');
-      });
+    this.router.navigate([`/entity/${qid}`]);
   }
 }

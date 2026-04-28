@@ -9,7 +9,6 @@ import uuid
 from backend.functions.services.ranking_pipeline import pipeline
 from backend.functions.services.extract_triples import (extracttriples, est_triplet_valide, recuperer_labels_batch)
 
-
 router = APIRouter()
 
 BASE_DIR = Path(__file__).resolve().parents[2]
@@ -56,10 +55,6 @@ def ensure_predicate(cursor, pid, label=""):
 def save_query_results(query_id, results):
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-
-    # -----------------------------
-    # 1. COLETAR TODOS IDS
-    # -----------------------------
     all_ids = set()
 
     for item in results:
@@ -70,25 +65,15 @@ def save_query_results(query_id, results):
                 r["object_qid"]
             ])
 
-    # -----------------------------
-    # 2. BUSCAR LABELS UMA VEZ
-    # -----------------------------
     labels = recuperer_labels_batch(list(all_ids))
-
-    # -----------------------------
-    # 3. INSERIR DADOS
-    # -----------------------------
     for item in results:
         for r in item["top_results"]:
-
             s = r["subject_qid"]
             p = r["predicate_pid"]
             o = r["object_qid"]
-
             ensure_entity(cur, s, labels.get(s, ""))
             ensure_predicate(cur, p, labels.get(p, ""))
             ensure_entity(cur, o, labels.get(o, ""))
-
             cur.execute("""
                 INSERT INTO query_results (
                     query_id,
@@ -105,7 +90,6 @@ def save_query_results(query_id, results):
                 r["triple"],
                 r["score"]
             ))
-
     conn.commit()
     conn.close()
 
