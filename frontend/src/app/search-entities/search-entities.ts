@@ -1,63 +1,52 @@
 import { Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { Search_Entities } from '../services/search-entities';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-search-entities',
   standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './search-entities.html',
-  styleUrl: './search-entities.scss'
+  templateUrl: './search-entities.html'
 })
 export class SearchEntities {
 
-  private service = inject(Search_Entities);
-  private router = inject(Router);
+  private http = inject(HttpClient);
+
+  entities = signal<any[]>([]);
+
+  page = 1;
+  page_size = 10;
+  total_pages = 1;
 
   search = '';
   favorite = false;
 
   sort_by = 'occurrences';
-  order: 'asc' | 'desc' = 'desc';
-
-  page = 1;
-  page_size = 10;
-
-  entities = signal<any[]>([]);
-  pagination = signal<any>({});
+  order = 'desc';
 
   ngOnInit() {
     this.load();
   }
 
   load() {
-    this.service.getEntities({
-      search: this.search,
-      favorite: this.favorite,
-      page: this.page,
-      page_size: this.page_size,
-      sort_by: this.sort_by,
-      order: this.order
+    this.http.get<any>('http://127.0.0.1:8000/search-entities', {
+      params: {
+        page: this.page,
+        page_size: this.page_size,
+        search: this.search,
+        favorite: this.favorite,
+        sort_by: this.sort_by,
+        order: this.order
+      }
     }).subscribe(res => {
-      this.entities.set(res.data || []);
-      this.pagination.set(res.pagination || {});
+      this.entities.set(res.data);
+      this.total_pages = res.pagination.total_pages;
     });
   }
 
-  toggleFavorite(qid: string) {
-    this.service.toggleFavorite(qid).subscribe(res => {
-      this.entities.update(list =>
-        list.map(e =>
-          e.qid === qid
-            ? { ...e, favorite: res.favorite }
-            : e
-        )
-      );
-    });
+  changePage(p: number) {
+    this.page = p;
+    this.load();
   }
-  
+
   toggleSort(field: string) {
     if (this.sort_by === field) {
       this.order = this.order === 'asc' ? 'desc' : 'asc';
@@ -68,12 +57,15 @@ export class SearchEntities {
     this.load();
   }
 
-  changePage(p: number) {
-    this.page = p;
-    this.load();
+  toggleFavorite(qid: string) {
+    this.http.patch(`http://127.0.0.1:8000/entities/${qid}/favorite`, {})
+      .subscribe(() => this.load());
   }
 
   visualize(qid: string) {
-    this.router.navigate([`/entity/${qid}`]);
+    this.http.get<any>(`http://127.0.0.1:8000/entity-graph/${qid}`)
+      .subscribe(res => {
+        window.open(`http://127.0.0.1:8000${res.image_url}`, '_blank');
+      });
   }
 }

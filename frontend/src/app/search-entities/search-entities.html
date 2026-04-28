@@ -1,11 +1,22 @@
 <div class="page">
   <h1>Search Entities</h1>
+
   <div class="filters">
-    <input placeholder="Search QID or label" [(ngModel)]="search" (input)="load()" />
-    <button class="star-btn" [class.active]="favorite" (click)="favorite = !favorite; load()">
+    <input 
+      placeholder="Search QID or label" 
+      [(ngModel)]="search" 
+      (input)="load()" 
+    />
+
+    <button 
+      class="star-btn" 
+      [class.active]="favorite" 
+      (click)="favorite = !favorite; load()"
+    >
       ⭐
     </button>
   </div>
+
   <table>
     <thead>
       <tr>
@@ -19,15 +30,10 @@
 
     <tbody>
       <tr *ngFor="let e of entities()">
-        <td style="cursor:pointer" (click)="toggleSort('qid')">
-          {{ e.qid }}
-        </td>
-        <td>
-          {{ e.label }}
-        </td>
-        <td style="cursor:pointer" (click)="toggleSort('occurrences')">
-          {{ e.occurrences }}
-        </td>
+        <td>{{ e.qid }}</td>
+        <td>{{ e.label }}</td>
+        <td>{{ e.occurrences }}</td>
+
         <td>
           <button class="fav-btn" (click)="toggleFavorite(e.qid)">
             {{ e.favorite ? '⭐' : '☆' }}
@@ -42,13 +48,15 @@
       </tr>
     </tbody>
   </table>
-  
+
   <div class="pagination">
     <button (click)="changePage(page - 1)" [disabled]="page <= 1">
       ◀
     </button>
-    <span>Page {{ page }}</span>
-    <button (click)="changePage(page + 1)" [disabled]="entities().length < page_size">
+
+    <span>Page {{ page }} / {{ total_pages }}</span>
+
+    <button (click)="changePage(page + 1)" [disabled]="page >= total_pages">
       ▶
     </button>
   </div>
