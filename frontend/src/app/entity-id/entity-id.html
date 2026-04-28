@@ -1,8 +1,6 @@
 <div class="page">
-
   <h1>Entity: {{ qid }}</h1>
   <h2>Occurrences: {{ occurrences }}</h2>
-
   <table>
     <thead>
       <tr>
@@ -13,30 +11,23 @@
         <th>Visualize</th>
       </tr>
     </thead>
-
     <tbody>
       <ng-container *ngFor="let q of queries()">
-
-        <!-- MAIN ROW -->
         <tr>
           <td class="col-title">{{ q.title }}</td>
           <td>{{ q.hops }}</td>
           <td>{{ q.created_at | date:'dd/MM/yyyy HH:mm:ss' }}</td>
-          
           <td>
             <button (click)="visualize(q.id)">
               🔍
             </button>
           </td>
-
           <td>
             <button (click)="toggle(q.id)">
               {{ expanded()[q.id] ? '▼' : '▶' }}
             </button>
           </td>
         </tr>
-
-        <!-- SUB TABLE -->
         <tr *ngIf="expanded()[q.id]">
           <td colspan="5">
             <table class="sub-table">
@@ -49,7 +40,6 @@
                   <th>Score</th>
                 </tr>
               </thead>
-
               <tbody>
                 <tr *ngFor="let t of q.triples">
                   <td>{{ t.triple }}</td>
@@ -62,9 +52,7 @@
             </table>
           </td>
         </tr>
-
       </ng-container>
     </tbody>
   </table>
-
 </div>

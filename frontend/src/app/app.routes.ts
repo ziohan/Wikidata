@@ -6,6 +6,7 @@ import { LastQueries } from './last-queries/last-queries';
 import { QueryData } from './query-data/query-data';
 import { SearchEntities } from './search-entities/search-entities';
 import { EntityId } from './entity-id/entity-id';
+import { TopQueries } from './top-queries/top-queries';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -16,5 +17,6 @@ export const routes: Routes = [
   { path: 'history', component: Home },
   { path: 'query/:id', component: QueryData },
   { path: 'search-entities', component: SearchEntities },
-  { path: 'entity/:id', loadComponent: () => import('./entity-id/entity-id').then(m => m.EntityId) },
+  { path: 'entity/:id', component: EntityId },
+  { path: 'top-queries', component: TopQueries },
 ];

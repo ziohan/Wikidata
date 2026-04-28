@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 
+
 @Component({
   selector: 'app-entity-id',
   standalone: true,
@@ -11,14 +12,11 @@ import { CommonModule } from '@angular/common';
   styleUrl: './entity-id.scss'
 })
 export class EntityId {
-
   private route = inject(ActivatedRoute);
   private http = inject(HttpClient);
   private router = inject(Router);
-
   qid = '';
   occurrences = 0;
-
   queries = signal<any[]>([]);
   expanded = signal<{ [key: string]: boolean }>({});
 
@@ -34,7 +32,6 @@ export class EntityId {
         this.queries.set(res.queries);
       });
   }
-
   toggle(qid: string) {
     this.expanded.update(e => ({
       ...e,
