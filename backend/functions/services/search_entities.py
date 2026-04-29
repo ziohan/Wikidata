@@ -201,3 +201,28 @@ def get_entity_details(qid: str):
         "occurrences": occurrences,
         "queries": data
     }
+
+@router.patch("/entities/{qid}/favorite")
+def toggle_favorite(qid: str):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT qid FROM entity_favorites WHERE qid = ?
+    """, (qid,))
+    exists = cur.fetchone()
+
+    if exists:
+        cur.execute("""
+            DELETE FROM entity_favorites WHERE qid = ?
+        """, (qid,))
+        state = False
+    else:
+        cur.execute("""
+            INSERT INTO entity_favorites (qid) VALUES (?)
+        """, (qid,))
+        state = True
+    conn.commit()
+    conn.close()
+
+
+    return {"qid": qid, "favorite": state}

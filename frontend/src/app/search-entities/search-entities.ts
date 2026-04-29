@@ -3,6 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+interface Entity {
+  qid: string;
+  label: string;
+  occurrences: number;
+  favorite: boolean;
+}
 @Component({
   selector: 'app-search-entities',
   standalone: true,
@@ -13,7 +19,7 @@ import { Router } from '@angular/router';
 export class SearchEntities {
   private http = inject(HttpClient);
   private router = inject(Router);
-  entities = signal<any[]>([]);
+  entities = signal<Entity[]>([]);
   page = 1;
   page_size = 10;
   total_pages = 1;
@@ -21,6 +27,7 @@ export class SearchEntities {
   favorite = false;
   sort_by = 'occurrences';
   order = 'desc';
+  
   ngOnInit() {
     this.load();
   }
@@ -35,7 +42,7 @@ export class SearchEntities {
         sort_by: this.sort_by,
         order: this.order
       }
-    }).subscribe(res => {
+    }).subscribe((res: any) => {
       this.entities.set(res.data);
       this.total_pages = res.pagination.total_pages;
     });
@@ -57,8 +64,28 @@ export class SearchEntities {
   }
 
   toggleFavorite(qid: string) {
-    this.http.patch(`http://127.0.0.1:8000/entities/${qid}/favorite`, {})
-      .subscribe(() => this.load());
+    this.http.patch<any>(
+      `http://127.0.0.1:8000/entities/${qid}/favorite`,
+      {}
+    ).subscribe(res => {
+
+      const updated = this.entities().map(e => {
+        if (e.qid === qid) {
+          return {
+            ...e,
+            favorite: res.favorite
+          };
+        }
+        return e;
+      });
+
+      this.entities.set(updated);
+    });
+  }
+  toggleFavoritesFilter() {
+    this.favorite = !this.favorite;
+    this.page = 1;
+    this.load();
   }
 
   visualize(qid: string) {

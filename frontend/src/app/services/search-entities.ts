@@ -16,9 +16,11 @@ export class Search_Entities {
     if (filters.search) params.search = filters.search;
     if (filters.favorite) params.favorite = true;
     return this.http.get<any>(`${this.base}/search-entities`, { params });
-  
   }
   toggleFavorite(qid: string) {
-    return this.http.patch<any>(`${this.base}/entities/${qid}/favorite`, {});
+    return this.http.patch<any>(
+      `${this.base}/entities/${qid}/favorite`,
+      {}
+    );
   }
 }
