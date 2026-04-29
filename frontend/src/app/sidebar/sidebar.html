@@ -1,10 +1,13 @@
-<div class="hamburger" *ngIf="!isOpen()" (click)="toggleMenu()">
-  ☰
+<div class="topbar">
+  <div class="hamburger" (click)="toggleMenu()">☰</div>
+  <div class="brand">amU</div>
+</div>
+<div class="underbar">
+  Aix Marseille Université
 </div>
 <div class="overlay" *ngIf="isOpen()" (click)="closeMenu()"></div>
 <div class="sidebar" [class.open]="isOpen()">
-
-  <div class="hamburger inside" *ngIf="isOpen()" (click)="toggleMenu()">
+  <div class="hamburger inside" (click)="toggleMenu()">
     ☰
   </div>
   <div class="menu">

@@ -1,11 +1,44 @@
-.hamburger {
+.topbar {
   position: fixed;
-  top: 18px;
-  left: 18px;
-  font-size: 28px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background:  #3b3768;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 0 20px;
+  z-index: 5500;
+}
+
+.brand {
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+
+.underbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  background:  #3b3768;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 5500;
+}
+
+.hamburger {
+  font-size: 26px;
   color: white;
   cursor: pointer;
-  z-index: 6000;
   user-select: none;
 }
 
@@ -13,8 +46,6 @@
   position: absolute;
   top: 18px;
   right: 18px;
-  left: auto;
-  color: white;
 }
 
 .overlay {
@@ -30,7 +61,7 @@
   left: -280px;
   width: 280px;
   height: 100%;
-  background: linear-gradient(180deg, #7b2cbf, #5a189a);
+  background:  #3b3768;
   padding: 70px 20px 20px 20px;
   transition: left 0.3s ease, opacity 0.3s ease;
   opacity: 0;
@@ -60,7 +91,7 @@
   border: none;
   text-align: left;
   cursor: pointer;
-  transition: background 0.2s
+  transition: background 0.2s;
 }
 
 .item:hover {
