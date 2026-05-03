@@ -13,11 +13,10 @@ import { HttpClient } from '@angular/common/http';
 export class QueryGenerated {
   private router = inject(Router);
   private http = inject(HttpClient);
-  data = signal<any>(null);
   title = signal('');
   graph = signal('');
   pdf = signal('');
-  triples = signal<any[]>([]);
+  groupedTriples = signal<any>({});
 
   constructor() {
     const queryId = history.state?.query_id;
@@ -30,13 +29,20 @@ export class QueryGenerated {
         this.title.set(res.title);
         this.graph.set(`http://127.0.0.1:8000${res.image_url}`);
         this.pdf.set(`http://127.0.0.1:8000${res.download_pdf}`);
-        this.triples.set(res.triples.map((t: any) => t.triple));
+        this.groupedTriples.set(res.grouped_triples);
       });
   }
-
-  
   downloadTriples() {
-    const content = this.triples().join('\n');
+    let content = '';
+    const grouped = this.groupedTriples();
+
+    for (const entity in grouped) {
+      content += `${entity}:\n`;
+      grouped[entity].forEach((t: any) => {
+        content += `${t.triple}\n`;
+      });
+      content += '\n';
+    }
     const blob = new Blob([content], { type: 'text/plain' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);

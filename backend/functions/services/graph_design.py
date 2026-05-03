@@ -31,7 +31,7 @@ def normalize_qid_list(qid_value):
     return clean_qids
 
 # Break the text into multiple lines for better display in the graph
-def short_label(text, width=14):
+def short_label(text, width=12):
     return "\n".join(wrap(str(text), width=width))
 
 # Remove duplicates
@@ -116,6 +116,10 @@ def assign_subtree_positions(pos, entity_block, side, entity_y, x_entity, x_pred
 
         current_top -= w * pred_gap
 
+def short_title_label(title, max_len=20):
+    title = str(title)
+    return title if len(title) <= max_len else title[:max_len] + "..."
+
 def graph_design(UniqueList3, listtripletslabel, data, query_id):
     plt.rcParams["figure.figsize"] = (24, 16)
     plt.rcParams["font.family"] = "DejaVu Sans"
@@ -131,8 +135,8 @@ def graph_design(UniqueList3, listtripletslabel, data, query_id):
     file = file.dropna(subset=["Title", "QID"]).reset_index(drop=True)
 
     i = 0
-    doc_id = f"Doc-{i}"
     title = file.loc[i, "Title"]
+    doc_id = short_title_label(title)
     doc_qids = normalize_qid_list(file.loc[i, "QID"])
     list_index = [idx for idx, qid in enumerate(ListeEntity) if qid in doc_qids]
 
@@ -278,16 +282,16 @@ def graph_design(UniqueList3, listtripletslabel, data, query_id):
 
         if ntype == "document":
             node_colors.append("#2E7D32")
-            node_sizes.append(4200)
+            node_sizes.append(8000)
         elif ntype == "entity":
             node_colors.append("#F57C00")
-            node_sizes.append(2600)
+            node_sizes.append(7000)
         elif ntype == "predicate":
             node_colors.append("#FFEB3B")
-            node_sizes.append(1900)
+            node_sizes.append(6500)
         else:
             node_colors.append("#29B6F6")
-            node_sizes.append(1700)
+            node_sizes.append(6000)
 
     ys = [p[1] for p in pos.values()]
     y_span = max(ys) - min(ys) if ys else 10

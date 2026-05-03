@@ -13,11 +13,17 @@
         <a class="btn" [href]="pdf()" download>Download PDF</a>
       </div>
     </div>
-
-    <div class="card center">
+    <div class="card">
       <h2 class="section-title">Triples</h2>
       <div class="triples">
-        <p *ngFor="let t of triples()">{{ t }}</p>
+        <div *ngFor="let entity of groupedTriples() | keyvalue">
+          <h3 class="entity-title">{{ entity.key }}</h3>
+          <div class="triple-list">
+            <p *ngFor="let t of entity.value">
+              {{ t.triple }}
+            </p>
+          </div>
+        </div>
       </div>
       <button class="btn" (click)="downloadTriples()">
         Download TXT

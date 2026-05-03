@@ -46,23 +46,46 @@ def get_query_generated(query_id: str):
         triples = cursor.fetchall()
         conn.close()
 
+        grouped = {}
         triples_list = []
         structured_triples = []
         for triple_str, score in triples:
-            triples_list.append({
+            parsed = parse_triple(triple_str)
+            if not parsed:
+                continue
+
+            subject, predicate, obj = parsed
+            if subject not in grouped:
+                grouped[subject] = []
+            grouped[subject].append({
                 "triple": triple_str,
                 "score": score
             })
-            parsed = parse_triple(triple_str)
-            if parsed:
-                structured_triples.append(parsed)
+            triples_list.append({
+                "triple": triple_str,
+                "score": score,
+                "subject": subject
+            })
+            structured_triples.append([subject, predicate, obj])
+            
+        UniqueList3 = []
+        listtripletslabel = []
+        for i, (entity, triples_list_entity) in enumerate(grouped.items()):
+            qid_fake = f"Q{i+1}"  # fake QID só pro layout
+            UniqueList3.append(qid_fake)
 
-        UniqueList3 = ["Q1"]
-        listtripletslabel = [structured_triples]
+            entity_triples = []
+
+            for t in triples_list_entity:
+                parsed = parse_triple(t["triple"])
+                if parsed:
+                    entity_triples.append(parsed)
+
+            listtripletslabel.append(entity_triples)
 
         df = pd.DataFrame([{
             "Title": title,
-            "QID": "Q1"
+            "QID": str(UniqueList3)
         }])
 
         graph_design(
@@ -78,7 +101,7 @@ def get_query_generated(query_id: str):
             "hops": hops,
             "top_n": top_n,
             "triples": triples_list,
-
+            "grouped_triples": grouped,
             "image_url": f"/graph/{query_id}/png",
             "download_png": f"/graph/{query_id}/png",
             "download_pdf": f"/graph/{query_id}/pdf"
