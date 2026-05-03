@@ -58,38 +58,41 @@ def save_query_results(query_id, results):
     all_ids = set()
 
     for item in results:
-        for r in item["top_results"]:
-            all_ids.update([
-                r["subject_qid"],
-                r["predicate_pid"],
-                r["object_qid"]
-            ])
+        for ent in item["entities"]:
+            for r in ent["top_results"]:
+                all_ids.update([
+                    r["subject_qid"],
+                    r["predicate_pid"],
+                    r["object_qid"]
+                ])
 
     labels = recuperer_labels_batch(list(all_ids))
     for item in results:
-        for r in item["top_results"]:
-            s = r["subject_qid"]
-            p = r["predicate_pid"]
-            o = r["object_qid"]
-            ensure_entity(cur, s, labels.get(s, ""))
-            ensure_predicate(cur, p, labels.get(p, ""))
-            ensure_entity(cur, o, labels.get(o, ""))
-            cur.execute("""
-                INSERT INTO query_results (
+        for ent in item["entities"]:
+            for r in ent["top_results"]:
+                s = r["subject_qid"]
+                p = r["predicate_pid"]
+                o = r["object_qid"]
+
+                ensure_entity(cur, s, labels.get(s, ""))
+                ensure_predicate(cur, p, labels.get(p, ""))
+                ensure_entity(cur, o, labels.get(o, ""))
+                cur.execute("""
+                    INSERT INTO query_results (
+                        query_id,
+                        subject_qid,
+                        predicate_pid,
+                        object_qid,
+                        triple,
+                        score
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?)
+                """, (
                     query_id,
-                    subject_qid,
-                    predicate_pid,
-                    object_qid,
-                    triple,
-                    score
-                )
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (
-                query_id,
-                s, p, o,
-                r["triple"],
-                r["score"]
-            ))
+                    s, p, o,
+                    r["triple"],
+                    r["score"]
+                ))
     conn.commit()
     conn.close()
 

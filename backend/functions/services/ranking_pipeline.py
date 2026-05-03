@@ -186,16 +186,34 @@ def pipeline(csv_path, top_n=10):
 
         qids = [f"Q{x}" if not str(x).startswith("Q") else x for x in qids]
 
-        triples = build_triples(qids)
+        entity_results = []
+        print(f"\nQUERY: {title}")
 
-        results = rank(title, triples, top_n=top_n)
+        for qid in qids:
+            print(f"\nENTITY {qid}")
+            triples = build_triples([qid])
+            ranked = rank(title, triples, top_n=top_n)
+            print(f"Top {top_n} triples:\n")
+            for i, (t, s, sq, pp, oq) in enumerate(ranked, 1):
+                print(f"{i:02d} - {s:.4f} | {t}")
 
+            entity_results.append({
+                "qid": qid,
+                "triples_used": len(triples),
+                "top_results": [
+                    {
+                        "triple": t,
+                        "score": s,
+                        "subject_qid": sq,
+                        "predicate_pid": pp,
+                        "object_qid": oq
+                    }
+                    for t, s, sq, pp, oq in ranked
+                ]
+            })
         all_results.append({
             "title": title,
-            "triples_used": len(triples),
-            "top_results": [
-                {"triple": t, "score": s, "subject_qid": sq, "predicate_pid": pp, "object_qid": oq} for t, s, sq, pp, oq in results
-            ]
+            "entities": entity_results
         })
 
     return all_results
