@@ -63,7 +63,6 @@ def top_triplets(limit: int = 10):
                 COUNT(*) as occurrences
             FROM query_results qr
             GROUP BY qr.triple
-            HAVING occurrences >= 2
             ORDER BY avg_score DESC
             LIMIT ?
         """, (limit,))
