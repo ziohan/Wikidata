@@ -52,7 +52,9 @@ Using techniques such as **data cleaning, data linking, and feature engineering*
 
 ---
 
-## 🤖 Training Model
+### 🤖 Training Model
+
+---
 
 Using methods such as **data embedding** and **data bi-encoding**, a hybrid model using **tranformers**, **weighting predicate** and **cosine similarity** was developed, using:
 
@@ -90,7 +92,11 @@ Which the base value is obtained with the following formula:
 <strong><code>base = 0.45 x triplet_score + 0.35 x cross_score + 0.2 entity_score</code></strong>
 </p>
 
+---
+
 ### 📈 Graph Generation Model
+
+---
 
 <p align = "center">
 <img width="480" height="270" alt="Graph_Example" src="https://github.com/user-attachments/assets/21100ee5-bf9d-467e-8fe6-6dff7a0b2a5f" />
