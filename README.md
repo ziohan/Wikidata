@@ -44,7 +44,7 @@ Using techniques such as **data cleaning, data linking, and feature engineering*
 
 ### Data Enrichment
 
-- Triplet Extraction by labels extraction from ids
+- Triplet generation by labels extraction from ids
 
 - Entities, predicates, and triples insertion into the database
 
