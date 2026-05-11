@@ -109,13 +109,13 @@ As the dataset did not contain labels indicating whether a triplet was correct o
 <img width="1100" height="500" alt="query data" src="https://github.com/user-attachments/assets/f8166dbd-4d1b-421c-ae9b-7f495e0a83b8" />
 
 ## 🧰 Tools and Libraries Used
-- ``Wikidata`` - Wikipedia API which allows access to Wikipedia's dataset
+- ``Wikidata`` - Wikipedia's API which allows access to Wikipedia's dataset
 - ``SPARQL`` - Queries Wikidata with subject-predicate-object queries
 - `Angular` – Frontend development
 - `FastAPI` – Database manipulation
 - `numpy` – Mathematical operations
 - `SpaCy` – NLP manipulation
-- `scikit-learn` – Model training, evaluation, and metrics
+- `scikit-learn` – Model training
 - `Sentence Transformers` – Bi-encoding and Cross-encoding models importation
 
 ## 🚀 Future Improvements
