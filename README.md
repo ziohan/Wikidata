@@ -104,7 +104,7 @@ Which the base value is obtained with the following formula:
 
 ## 📊 Model Evaluation
 
-As there were no dataset labels containing the necessary data to say if the triplet was correct or not for the query, there was no evaluation method implemented on the project. However, a series of tests were executed, obtaining consistent information as output, as it can be seen below with the input ``"What is the capital of France?"`` and the best scored output being ``"France capital Paris"``
+As the dataset did not contain labels indicating whether a triplet was correct or incorrect with respect to the query, no quantitative evaluation method was implemented in this project. However, several tests were conducted, producing consistent and coherent outputs. For example, given the input query ``“What is the capital of France?”``, the highest-scored result obtained was ``“France capital Paris”``.
 
 <img width="1100" height="500" alt="query data" src="https://github.com/user-attachments/assets/f8166dbd-4d1b-421c-ae9b-7f495e0a83b8" />
 
