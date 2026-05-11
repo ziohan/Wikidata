@@ -52,7 +52,7 @@ Using techniques such as **data cleaning, data linking, and feature engineering*
 
 ---
 
-## 🤖 Machine Learning Model
+## 🤖 Training Model
 
 Using methods such as **data embedding** and **data bi-encoding**, a hybrid model using **tranformers**, **weighting predicate** and **cosine similarity** was developed, using:
 
