@@ -56,7 +56,7 @@ Using techniques such as **data cleaning, data linking, and feature engineering*
 
 ---
 
-Using methods such as **data embedding** and **data bi-encoding**, a hybrid model using **tranformers**, **weighting predicate** and **cosine similarity** was developed, using:
+Using methods such as **data embedding** and **data bi-encoding**, a hybrid model using **tranformers**, **weighting predicate** and **cosine similarity** was developed for data ranking, using:
 
 - Triplet Cosine similarity: Similarity of embeddings between title and triplet using cosines and bi-encoding
 
