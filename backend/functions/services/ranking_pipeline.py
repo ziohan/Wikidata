@@ -92,11 +92,11 @@ def build_triples(qids):
 
     # Build the final list of triples with labels
     for s, p, o in all_triples:
-        s_l = labels.get(s, s)
-        p_l = labels.get(p, p)
-        o_l = labels.get(o, o)
+        s_l = labels.get(s, "")
+        p_l = labels.get(p, "")
+        o_l = labels.get(o, "")
 
-        raw = f"{s_l} {p_l} {o_l}"
+        raw = f"{s_l} | {p_l} | {o_l}"
         if raw in seen:
             continue
         seen.add(raw)
@@ -169,7 +169,51 @@ def rank(title, triples, top_n=10):
         score = base * weight
         final_scores.append(score)
     idx = np.argsort(final_scores)[::-1][:top_n]
-    return [(triples[i]["raw"], float(final_scores[i]), triples[i]["subject_qid"], triples[i]["predicate_pid"], triples[i]["object_qid"]) for i in idx]
+    return [(
+        triples[i]["raw"],
+        float(final_scores[i]),
+        triples[i]["subject_qid"],
+        triples[i]["predicate_pid"],
+        triples[i]["object_qid"],
+        triples[i]["subject"],
+        triples[i]["predicate"],
+        triples[i]["object"],
+    ) for i in idx]
+
+def pipeline_from_text(text, qids, top_n=10):
+    entity_results = []
+    print(f"\nQUERY: {text}")
+
+    for qid in qids:
+        print(f"\nENTITY {qid}")
+        triples = build_triples([qid])
+        ranked = rank(text, triples, top_n=top_n)
+        print(f"Top {top_n} triples:\n")
+        for i, (t, s, sq, pp, oq, s_l, p_l, o_l) in enumerate(ranked, 1):
+            print(f"{i:02d} - {s:.4f} | {t}")
+
+        entity_results.append({
+            "qid": qid,
+            "triples_used": len(triples),
+            "top_results": [
+                {
+                    "triple": t,
+                    "score": s,
+                    "subject_qid": sq,
+                    "predicate_pid": pp,
+                    "object_qid": oq,
+                    "subject_label": s_l,
+                    "predicate_label": p_l,
+                    "object_label": o_l,
+                }
+                for t, s, sq, pp, oq, s_l, p_l, o_l in ranked
+            ]
+        })
+
+    return [{
+        "title": text,
+        "entities": entity_results
+    }]
 
 def pipeline(csv_path, top_n=10):
     df = pd.read_csv(csv_path, sep=";")
@@ -194,7 +238,7 @@ def pipeline(csv_path, top_n=10):
             triples = build_triples([qid])
             ranked = rank(title, triples, top_n=top_n)
             print(f"Top {top_n} triples:\n")
-            for i, (t, s, sq, pp, oq) in enumerate(ranked, 1):
+            for i, (t, s, sq, pp, oq, s_l, p_l, o_l) in enumerate(ranked, 1):
                 print(f"{i:02d} - {s:.4f} | {t}")
 
             entity_results.append({
@@ -206,9 +250,12 @@ def pipeline(csv_path, top_n=10):
                         "score": s,
                         "subject_qid": sq,
                         "predicate_pid": pp,
-                        "object_qid": oq
+                        "object_qid": oq,
+                        "subject_label": s_l,
+                        "predicate_label": p_l,
+                        "object_label": o_l,
                     }
-                    for t, s, sq, pp, oq in ranked
+                    for t, s, sq, pp, oq, s_l, p_l, o_l in ranked
                 ]
             })
         all_results.append({

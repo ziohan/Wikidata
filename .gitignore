@@ -43,3 +43,21 @@ coverage/
 *.lock
 
 KG_papers_tree_layout/*
+
+# Cache Wikidata
+triplet_cache.json
+label_cache.json
+entity_cache.json
+wikipedia_qid_cache.json
+build_cache.py
+prefill_cache.py
+prefill_cache_rest.py
+find_qids.py
+find_qids2.py
+find_qids3.py
+find_qids4.py
+check_entities.py
+check_entities2.py
+check_imagenet.py
+check_search.py
+build_cache.py

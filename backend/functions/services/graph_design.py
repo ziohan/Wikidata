@@ -2,6 +2,8 @@ import os
 import ast
 import math
 import networkx as nx
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 from textwrap import wrap

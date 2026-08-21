@@ -2,12 +2,66 @@
   <div class="card">
     <h1 class="title">New Query</h1>
     <div class="form">
-      <label>Upload CSV</label>
-      <input type="file" (change)="onFileSelected($event)" class="input" />
+
+      <div class="toggle-buttons">
+        <button
+          [class]="inputMode === 'text' ? 'btn primary' : 'btn secondary'"
+          (click)="setInputMode('text')">
+          Write Text
+        </button>
+        <button
+          [class]="inputMode === 'file' ? 'btn primary' : 'btn secondary'"
+          (click)="setInputMode('file')">
+          Upload .txt
+        </button>
+      </div>
+
+      <ng-container *ngIf="inputMode === 'text'">
+        <label>Text</label>
+        <textarea [(ngModel)]="formText" class="input" rows="5" placeholder="Enter your text here..."></textarea>
+      </ng-container>
+
+      <ng-container *ngIf="inputMode === 'file'">
+        <label>Upload .txt file</label>
+        <input type="file" accept=".txt" (change)="onFileSelected($event)" class="input" />
+        <span *ngIf="fileName" class="file-name"> {{ fileName }}</span>
+      </ng-container>
+
+      <label>Entity Linking Model</label>
+      <div class="toggle-buttons">
+        <button
+          [class]="formModel === 'spacy' ? 'btn primary' : 'btn secondary'"
+          (click)="formModel = 'spacy'">
+          SpaCy
+        </button>
+        <button
+          [class]="formModel === 'bert' ? 'btn primary' : 'btn secondary'"
+          (click)="formModel = 'bert'">
+          BERT
+        </button>
+        <button
+          [class]="formModel === 'rel' ? 'btn primary' : 'btn secondary'"
+          (click)="formModel = 'rel'">
+          REL
+        </button>
+        <button
+          [class]="formModel === 'all' ? 'btn primary' : 'btn secondary'"
+          (click)="formModel = 'all'">
+          All (Merge)
+        </button>
+      </div>
+      <small class="model-description">
+        <span *ngIf="formModel === 'spacy'">SpaCy NER + Wikidata Search API — rapide</span>
+        <span *ngIf="formModel === 'bert'">BERT NER + Wikidata Search API — plus précis</span>
+        <span *ngIf="formModel === 'rel'">Radboud Entity Linker — très précis</span>
+        <span *ngIf="formModel === 'all'">Tous les modèles fusionnés — meilleure couverture</span>
+      </small>
+
       <label>Number of Hops</label>
       <input type="number" [(ngModel)]="formHops" class="input" />
       <label>Number of Triples</label>
       <input type="number" [(ngModel)]="formTopN" class="input" />
+
       <div class="buttons">
         <button class="btn secondary" (click)="goBack()">
           ⬅ Back
@@ -16,12 +70,9 @@
           Execute Query
         </button>
       </div>
-      <pre class="response" *ngIf="response()">
-{{response()}}
-      </pre>
-      <div class="error" *ngIf="error()">
-        {{error()}}
-      </div>
+
+      <pre class="response" *ngIf="response()">{{ response() }}</pre>
+      <div class="error" *ngIf="error()">{{ error() }}</div>
 
     </div>
   </div>

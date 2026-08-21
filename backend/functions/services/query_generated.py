@@ -12,14 +12,10 @@ DB_PATH = BASE_DIR / "data" / "wikidata.db"
 GRAPH_DIR = Path("./KG_papers_tree_layout")
     
 def parse_triple(triple_str: str):
-    parts = triple_str.split()
-    if len(parts) < 3:
+    parts = triple_str.split(" | ")
+    if len(parts) != 3:
         return None
-
-    subject = parts[0]
-    obj = parts[-1]
-    predicate = " ".join(parts[1:-1])
-    return [subject, predicate, obj]
+    return [parts[0].strip(), parts[1].strip(), parts[2].strip()]
 
 @router.get("/query-generated/{query_id}")
 def get_query_generated(query_id: str):
@@ -37,19 +33,20 @@ def get_query_generated(query_id: str):
             return JSONResponse({"error": "Query não encontrada"}, status_code=404)
 
         title, hops, top_n = query
+
         cursor.execute("""
             SELECT triple, score
             FROM query_results
             WHERE query_id = ?
             ORDER BY score DESC
         """, (query_id,))
-        triples = cursor.fetchall()
+        rows = cursor.fetchall()
         conn.close()
 
         grouped = {}
         triples_list = []
-        structured_triples = []
-        for triple_str, score in triples:
+
+        for triple_str, score in rows:
             parsed = parse_triple(triple_str)
             if not parsed:
                 continue
@@ -66,16 +63,15 @@ def get_query_generated(query_id: str):
                 "score": score,
                 "subject": subject
             })
-            structured_triples.append([subject, predicate, obj])
-            
+
         UniqueList3 = []
         listtripletslabel = []
+
         for i, (entity, triples_list_entity) in enumerate(grouped.items()):
-            qid_fake = f"Q{i+1}"  # fake QID só pro layout
+            qid_fake = f"Q{i+1}"
             UniqueList3.append(qid_fake)
 
             entity_triples = []
-
             for t in triples_list_entity:
                 parsed = parse_triple(t["triple"])
                 if parsed:
